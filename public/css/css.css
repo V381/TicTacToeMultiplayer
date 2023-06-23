@@ -1,6 +1,7 @@
 
 @import url(_reset.css);
 @import url(_variables.css);
+@import url(_start-game-button.css);
 
 body {
     background-color: var(--main-bg-color);
@@ -22,7 +23,6 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 10px;
-    width: 440px;
     height: 440px;
     border-radius: 5px;
   }
