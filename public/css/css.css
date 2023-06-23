@@ -51,3 +51,8 @@ body {
   .X{
     color: var(--x-color);
   }
+
+  .board {
+    filter: none;
+    pointer-events: none;
+  }
