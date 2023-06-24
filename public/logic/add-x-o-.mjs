@@ -9,13 +9,12 @@ export function addXandO() {
 
   cells.forEach((cell, index) => {
     cell.addEventListener('click', () => {
-      if (!cell.textContent && !gameEnded && currentPlayer === 'X') {
+      if (!cell.textContent && currentPlayer === 'X') {
         cell.textContent = currentPlayer;
         cell.classList.add(currentPlayer);
 
         if (checkWin(currentPlayer, cells)) {
           gameEnded = true;
-          alert(`Player ${currentPlayer} wins!`);
           restartGame();
           socket.emit('gameEnded', currentPlayer);
         } else if (checkDraw(cells)) {
@@ -33,24 +32,15 @@ export function addXandO() {
 
   socket.on('move', moveData => {
     const { index, player } = moveData;
-  
-    // Update the cell with the move made by the player
     cells[index].textContent = player;
     cells[index].classList.add('other-player');
-  
     currentPlayer = player === 'X' ? 'O' : 'X';
   });
 
   socket.on('gameEnded', winner => {
     gameEnded = true;
-    let setWinner;
-    if (winner === "X") {
-        setWinner = "O"
-    } else {
-        setWinner = "X"
-    }
     if (winner) {
-      alert(`Player ${setWinner} wins!`);
+      alert(`Player ${winner} wins!`);
     } else {
       alert("It's a draw!");
     }
