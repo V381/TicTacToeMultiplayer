@@ -1,5 +1,4 @@
 import { checkWin, checkDraw } from "./winner-logic.mjs";
-import { restartGame } from "./start-game.mjs";
 
 export function addXandO() {
   const cells = document.querySelectorAll('.cell');
@@ -7,6 +6,7 @@ export function addXandO() {
   let gameEnded = false;
   let currentPlayer = 'X';
   let moves = 0;
+  let gameStarted = false;
 
   cells.forEach((cell, index) => {
     cell.addEventListener('click', () => {
@@ -39,7 +39,6 @@ export function addXandO() {
 
   socket.on('gameEnded', (winner, moveData) => {
     gameEnded = true;
-    console.log(winner, "<<<<<<<<<<<<");
     if (winner) {
       cells[moveData.index].textContent = currentPlayer;
       if (currentPlayer === 'X') {
@@ -53,7 +52,6 @@ export function addXandO() {
       alert("It's a draw!");
       showNotification('Draw', "It's a draw! The game ended in a tie.");
     }
-    restartGame();
   });
 
   function showNotification(title, message) {
