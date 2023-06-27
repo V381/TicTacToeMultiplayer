@@ -6,18 +6,23 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/views/index.html');
+  res.sendFile(__dirname + '/public/views/index.html');
 });
 
-let lobbyPlayers = []; 
-let readyPlayers = 0; 
+let lobbyPlayers = [];
+let readyPlayers = 0;
+
+function resetPlayers() {
+  lobbyPlayers = [];
+  readyPlayers = 0;
+}
 
 io.on('connection', socket => {
     console.log('A user connected');
-    let moveData = {}; 
+    let moveData = {};
     let movesX = 0;
-    let movesO = 0; 
-
+    let movesO = 0;
+  
     lobbyPlayers.push(socket.id);
     io.emit('playerJoined', lobbyPlayers);
   
@@ -36,38 +41,50 @@ io.on('connection', socket => {
   
     socket.on('gameEnded', (winner, moveData) => {
       let symbol = winner === 'X' ? 'X' : 'O';
-      io.emit('gameEnded', symbol, moveData); 
+      io.emit('gameEnded', symbol, moveData);
     });
   
     socket.on('gameStarted', () => {
       console.log('Game started');
       readyPlayers++;
-
-      if (players.length >= 4) {
+  
+      if (lobbyPlayers.length >= 6) {
         socket.emit('gameAlreadyStarted');
       } else {
-        players.push(socket.id);
-        io.emit('playerJoined', players);
+        lobbyPlayers.push(socket.id); // Change "players" to "lobbyPlayers"
+        io.emit('playerJoined', lobbyPlayers);
       }
-      
+  
       // Check if all players are ready
       if (readyPlayers === lobbyPlayers.length) {
-          io.emit('startGame'); // Emit event to start the game
-          readyPlayers = 0; // Reset the readyPlayers counter
-        }
+        io.emit('startGame'); // Emit event to start the game
+        resetPlayers()
+      }
       io.emit('gameStarted');
+    });
+  
+    socket.on('resetPlayers', () => {
+      resetPlayers();
+      io.emit('playersReset');
     });
   
     socket.on('disconnect', () => {
         console.log('A user disconnected');
-        const playerIndex = lobbyPlayers.indexOf(socket.id);
-        
+        const playerIndex = lobbyPlayers.findIndex(id => id === socket.id);
+      
         if (playerIndex > -1) {
           lobbyPlayers.splice(playerIndex, 1);
           io.emit('playerLeft', socket.id, lobbyPlayers);
         }
+      
+        // Reset readyPlayers count if all players have disconnected
+        if (lobbyPlayers.length === 0) {
+          readyPlayers = 0;
+        }
       });
   });
+  
+  
 
 app.use(express.static(__dirname + '/public'))
 app.use(express.static(__dirname + '/public/views/css'))
@@ -76,5 +93,5 @@ app.use(express.static(__dirname + '/public/logic'))
 const port = process.env.PORT || 3000;
 
 server.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });

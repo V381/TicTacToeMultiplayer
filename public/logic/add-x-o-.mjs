@@ -42,10 +42,8 @@ export function addXandO() {
     if (winner) {
       cells[moveData.index].textContent = currentPlayer;
       if (currentPlayer === 'X') {
-        alert(`Player X wins! You are the winner!`);
         showNotification('Winner', 'Congratulations! You won the game!');
       } else {
-        alert(`Player O wins! You are the loser!`);
         showNotification('Winner', 'Better luck next time! You lost the game.');
       }
     } else {
