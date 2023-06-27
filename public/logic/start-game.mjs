@@ -19,6 +19,5 @@ export function restartGame() {
         clearCells();
         addXandO();
         startGame();
-        location.reload();
     });    
 }

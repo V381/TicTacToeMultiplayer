@@ -11,24 +11,37 @@ app.get('/', (req, res) => {
 
 io.on('connection', socket => {
     console.log('A user connected');
-    socket.on('move', moveData => {
-        console.log('Received move:', moveData);
-        socket.broadcast.emit('move', moveData);
+    let moveData = {}; 
+    let movesX = 0;
+    let movesO = 0; 
+  
+    socket.on('move', move => {
+      console.log('Received move:', move);
+      moveData = move;
+  
+      if (move.player === 'X') {
+        movesX = move.moves;
+      } else if (move.player === 'O') {
+        movesO = move.moves;
+      }
+  
+      socket.broadcast.emit('move', { ...move, movesX, movesO });
     });
-    socket.on('gameEnded', winner => {
-        console.log('Game ended:', winner ? `Player ${winner} wins!` : "It's a draw!");
-        io.emit('gameEnded', winner); 
+  
+    socket.on('gameEnded', (winner, moveData) => {
+      let symbol = winner === 'X' ? 'X' : 'O';
+      io.emit('gameEnded', symbol, moveData); 
     });
-
+  
     socket.on('gameStarted', () => {
-        console.log('Game started');
-        io.emit('gameStarted');
+      console.log('Game started');
+      io.emit('gameStarted');
     });
-
+  
     socket.on('disconnect', () => {
-        console.log('A user disconnected');
+      console.log('A user disconnected');
     });
-});
+  });
 
 app.use(express.static(__dirname + '/public'))
 app.use(express.static(__dirname + '/public/views/css'))

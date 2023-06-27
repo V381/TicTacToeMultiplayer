@@ -10,5 +10,6 @@ export function checkWin(player, cells) {
 }
 
 export function checkDraw(cells) {
-    return Array.from(cells).every(cell => cell.textContent !== '');
+  const isDraw = Array.from(cells).every(cell => cell.textContent !== '');
+  return isDraw;
 }
