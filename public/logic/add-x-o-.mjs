@@ -19,7 +19,7 @@ export function addXandO() {
         if (checkWin(currentPlayer, cells)) {
           gameEnded = true;
           socket.emit('gameEnded', currentPlayer, { index }); // Emit the move data
-        } else if (moves === cells.length) {
+        } else if (checkDraw(cells)) {
           gameEnded = true;
           socket.emit('gameEnded', null, { index }); // Emit the move data
         } else {

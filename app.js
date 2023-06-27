@@ -11,28 +11,26 @@ app.get('/', (req, res) => {
 
 io.on('connection', socket => {
     console.log('A user connected');
-    let moveData = {}; // Variable to store the move data
-    let movesX = 0; // Moves count for Player X
-    let movesO = 0; // Moves count for Player O
+    let moveData = {}; 
+    let movesX = 0;
+    let movesO = 0; 
   
     socket.on('move', move => {
       console.log('Received move:', move);
-      moveData = move; // Update the move data
+      moveData = move;
   
-      // Update the moves count for the respective player
       if (move.player === 'X') {
         movesX = move.moves;
       } else if (move.player === 'O') {
         movesO = move.moves;
       }
   
-      // Send the move data and moves count to all connected clients except the sender
       socket.broadcast.emit('move', { ...move, movesX, movesO });
     });
   
     socket.on('gameEnded', (winner, moveData) => {
       let symbol = winner === 'X' ? 'X' : 'O';
-      io.emit('gameEnded', symbol, moveData); // Pass the winner and move data to all connected clients
+      io.emit('gameEnded', symbol, moveData); 
     });
   
     socket.on('gameStarted', () => {

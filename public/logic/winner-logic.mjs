@@ -10,7 +10,6 @@ export function checkWin(player, cells) {
 }
 
 export function checkDraw(cells) {
-    const isDraw = Array.from(cells).every(cell => cell.textContent !== '');
-    const isGameEnded = Array.from(cells).some(cell => cell.textContent === 'X' || cell.textContent === 'O');
-    return isDraw && !isGameEnded;
-  }
+  const isDraw = Array.from(cells).every(cell => cell.textContent !== '');
+  return isDraw;
+}
