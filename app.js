@@ -1,3 +1,7 @@
+
+
+
+
 const express = require('express');
 const app = express();
 const http = require('http');
@@ -45,6 +49,7 @@ io.on('connection', socket => {
     });
   
     socket.on('gameStarted', () => {
+      console.log('Game started');
       readyPlayers++;
   
       if (lobbyPlayers.length >= 6) {
@@ -75,6 +80,8 @@ io.on('connection', socket => {
           lobbyPlayers.splice(playerIndex, 1);
           io.emit('playerLeft', socket.id, lobbyPlayers);
         }
+
+        resetPlayers();
       
         // Reset readyPlayers count if all players have disconnected
         if (lobbyPlayers.length === 0) {
