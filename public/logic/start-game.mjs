@@ -22,7 +22,7 @@ export function startGame() {
   socket.on('playerJoined', (players) => {
     console.log('Players:', players);
     playersJoined = players.length;
-    if (playersJoined > 2 && !gameStarted) {
+    if (playersJoined >= 2 && !gameStarted) {
       pageContent.classList.remove('blur-effect');
       gameStarted = true; // Set gameStarted flag to true
     }
@@ -33,6 +33,10 @@ export function startGame() {
     addXandO();
   });
 
+  socket.on('disconnect', () => {
+    console.log('Disconnected from server');
+    // Handle disconnection logic here
+  });
 
   socket.on('playersReset', () => {
     playersJoined = 0;
