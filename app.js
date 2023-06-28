@@ -45,7 +45,6 @@ io.on('connection', socket => {
     });
   
     socket.on('gameStarted', () => {
-      console.log('Game started');
       readyPlayers++;
   
       if (lobbyPlayers.length >= 6) {
