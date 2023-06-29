@@ -1,4 +1,4 @@
-import { addXandO } from "./add-x-o-.mjs";
+import { addXandO } from "./game.mjs";
 const socket = io();
 
 export function startGame() {
@@ -61,6 +61,5 @@ export function startGame() {
   // Listen for gameAlreadyStarted event
   socket.on('gameAlreadyStarted', () => {
     pageContent.innerHTML = 'Game is already being played. Please come back later.';
-    pageContent.classList.add('blur-effect');
   });
 }
