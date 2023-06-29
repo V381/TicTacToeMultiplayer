@@ -27,8 +27,8 @@ io.on('connection', socket => {
     let movesX = 0;
     let movesO = 0;
   
-    lobbyPlayers.push(socket.id);
     io.emit('playerJoined', lobbyPlayers);
+    lobbyPlayers.push(socket.id);
   
     socket.on('move', move => {
       console.log('Received move:', move);
