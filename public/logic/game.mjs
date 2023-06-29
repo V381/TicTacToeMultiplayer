@@ -1,34 +1,76 @@
-import { handleCellClick } from "./cell-handler.mjs";
-import { showNotification } from "./notifications.mjs";
+import { checkWin, checkDraw } from "./winner-logic.mjs";
 import { updateScore } from "./score.mjs";
+import { showNotification } from "./notifications.mjs";
 
 export function addXandO() {
   const cells = document.querySelectorAll('.cell');
   const socket = io();
-  const game = {
-    gameEnded: false,
-    currentPlayer: 'X',
-    moves: 0,
-    scoreX: 0,
-    scoreO: 0
-  };
+  let gameEnded = false;
+  let currentPlayer = 'X';
+  let moves = 0;
+  let scoreX = 0;
+  let scoreO = 0;
 
   cells.forEach((cell, index) => {
     cell.addEventListener('click', () => {
-      handleCellClick(cell, index, game, cells, socket, handleGameEnd);
+      if (!cell.textContent && currentPlayer === 'X' && !gameEnded) {
+        cell.textContent = currentPlayer;
+        cell.classList.add(currentPlayer);
+        moves++;
+
+        socket.emit('move', { index, player: currentPlayer, moves }); 
+        if (checkWin(currentPlayer, cells)) {
+          gameEnded = true;
+          socket.emit('gameEnded', currentPlayer, { index }); // Emit the move data
+        } else if (checkDraw(cells)) {
+          gameEnded = true;
+          socket.emit('gameEnded', null, { index }); // Emit the move data
+        } else {
+          currentPlayer = 'O';
+          socket.emit('move', { index, player: currentPlayer });
+        }
+      }
     });
   });
 
-  function handleGameEnd(winner, moveData) {
-    game.gameEnded = true;
+    function showResetButton() {
+        const resetButton = document.querySelector('.reset-game');
+        resetButton.style.display = 'block';
+        resetButton.addEventListener('click', () => {
+            resetGame();
+            resetButton.style.display = 'none';
+        });
+    }
+    
+    function resetGame() {
+        // Clear the board
+        cells.forEach(cell => {
+            cell.textContent = '';
+            cell.classList.remove('X', 'O', 'other-player');
+        });
+    
+        // Reset game variables
+        gameEnded = false;
+        currentPlayer = 'X';
+        moves = 0;
+    }
+
+  socket.on('move', moveData => {
+    const { index, player } = moveData;
+    cells[index].textContent = player;
+    cells[index].classList.add('other-player');
+    currentPlayer = player === 'X' ? 'O' : 'X';
+  });
+
+  socket.on('gameEnded', (winner, moveData) => {
+    gameEnded = true;
     if (winner) {
-      cells[moveData.index].textContent = game.currentPlayer;
-      if (game.currentPlayer === 'X') {
-        game.scoreX++;
+      cells[moveData.index].textContent = currentPlayer;
+      if (currentPlayer === 'X') {
+        scoreX++;
         showNotification('Winner', 'Congratulations! You won the game!');
       } else {
-        game.scoreO++;
-        console.log(game.currentPlayer);
+        scoreO++;
         showNotification('Winner', 'Better luck next time! You lost the game.');
       }
     } else {
@@ -36,36 +78,7 @@ export function addXandO() {
       showNotification('Draw', "It's a draw! The game ended in a tie.");
     }
     showResetButton();
-    socket.emit('scoreUpdated', game.scoreX, game.scoreO);
-    updateScore(game.scoreX, game.scoreO);
-  }
-
-  function showResetButton() {
-    const resetButton = document.querySelector('.reset-game');
-    resetButton.style.display = 'block';
-    resetButton.addEventListener('click', () => {
-      resetGame();
-      resetButton.style.display = 'none';
-    });
-  }
-
-  function resetGame() {
-    // Clear the board
-    cells.forEach(cell => {
-      cell.textContent = '';
-      cell.classList.remove('X', 'O', 'other-player');
-    });
-
-    // Reset game variables
-    game.gameEnded = false;
-    game.currentPlayer = 'X';
-    game.moves = 0;
-  }
-
-  socket.on('move', moveData => {
-    const { index, player } = moveData;
-    cells[index].textContent = player;
-    cells[index].classList.add('other-player');
-    game.currentPlayer = player === 'X' ? 'O' : 'X';
+    socket.emit('scoreUpdated', scoreX, scoreO);
+    updateScore(scoreX, scoreO);
   });
 }
