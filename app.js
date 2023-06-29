@@ -45,6 +45,9 @@ io.on('connection', socket => {
   
     socket.on('gameEnded', (winner, moveData) => {
       let symbol = winner === 'X' ? 'X' : 'O';
+      if (winner === null) {
+        symbol = null;
+      }
       io.emit('gameEnded', symbol, moveData);
     });
   
