@@ -1,4 +1,5 @@
 import { checkWin, checkDraw } from "./winner-logic.mjs";
+import { updateScore } from "./score.mjs";
 
 export function addXandO() {
   const cells = document.querySelectorAll('.cell');
@@ -7,6 +8,8 @@ export function addXandO() {
   let currentPlayer = 'X';
   let moves = 0;
   let gameStarted = false;
+  let scoreX = 0;
+  let scoreO = 0;
 
   cells.forEach((cell, index) => {
     cell.addEventListener('click', () => {
@@ -64,8 +67,10 @@ export function addXandO() {
     if (winner) {
       cells[moveData.index].textContent = currentPlayer;
       if (currentPlayer === 'X') {
+        scoreX++;
         showNotification('Winner', 'Congratulations! You won the game!');
       } else {
+        scoreO++;
         showNotification('Winner', 'Better luck next time! You lost the game.');
       }
     } else {
@@ -73,7 +78,14 @@ export function addXandO() {
       showNotification('Draw', "It's a draw! The game ended in a tie.");
     }
     showResetButton();
+    socket.emit('scoreUpdated', scoreX, scoreO);
+    updateScore(scoreX, scoreO);
   });
+
+  function updateScore(scoreX, scoreO) {
+    const scoreElement = document.querySelector('.score');
+    scoreElement.textContent = `Score: X - ${scoreX} | O - ${scoreO}`;
+  }
 
   function showNotification(title, message) {
     if ('Notification' in window) {
