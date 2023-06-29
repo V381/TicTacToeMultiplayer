@@ -64,6 +64,10 @@ export function addXandO() {
 
   socket.on('gameEnded', (winner, moveData) => {
     gameEnded = true;
+    if (winner === null) {
+      alert("It's a draw!");
+      showNotification('Draw', "It's a draw! The game ended in a tie.");
+    }
     if (winner) {
       cells[moveData.index].textContent = currentPlayer;
       if (currentPlayer === 'X') {
@@ -73,9 +77,6 @@ export function addXandO() {
         scoreO++;
         showNotification('Winner', 'Better luck next time! You lost the game.');
       }
-    } else {
-      alert("It's a draw!");
-      showNotification('Draw', "It's a draw! The game ended in a tie.");
     }
     showResetButton();
     socket.emit('scoreUpdated', scoreX, scoreO);
