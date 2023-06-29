@@ -79,3 +79,9 @@ body {
 .reset-game:hover {
     cursor: pointer;
 }
+
+.score {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
