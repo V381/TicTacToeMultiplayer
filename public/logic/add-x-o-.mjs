@@ -30,6 +30,28 @@ export function addXandO() {
     });
   });
 
+    function showResetButton() {
+        const resetButton = document.querySelector('.reset-game');
+        resetButton.style.display = 'block';
+        resetButton.addEventListener('click', () => {
+            resetGame();
+            resetButton.style.display = 'none';
+        });
+    }
+    
+    function resetGame() {
+        // Clear the board
+        cells.forEach(cell => {
+            cell.textContent = '';
+            cell.classList.remove('X', 'O', 'other-player');
+        });
+    
+        // Reset game variables
+        gameEnded = false;
+        currentPlayer = 'X';
+        moves = 0;
+    }
+
   socket.on('move', moveData => {
     const { index, player } = moveData;
     cells[index].textContent = player;
@@ -50,6 +72,7 @@ export function addXandO() {
       alert("It's a draw!");
       showNotification('Draw', "It's a draw! The game ended in a tie.");
     }
+    showResetButton();
   });
 
   function showNotification(title, message) {
